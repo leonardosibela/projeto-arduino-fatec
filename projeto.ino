@@ -8,15 +8,15 @@ int ledVerde = 10;
 int ledAmarelo = 11;
 int ledBranco = 3;
 int ledPin = 4;
-int ldrPin = 0;
-int ldrValor = 0;
+int pResistor = 0;
+int pResistorValor = 0;
 double duration, cm;
+const int ENOUGH_LIGHT = 250;
 
 
 // Declaração de Funções
 
 void acenderLed(int corLed, double distanciaIncial, double distanciaFinal){
-
     (cm > distanciaIncial and cm < distanciaFinal) ? digitalWrite(corLed, LOW) : digitalWrite(corLed, HIGH);
 }
 
@@ -35,9 +35,6 @@ void setup() {
 }
 
 void loop(){
-    ldrValor = analogRead(ldrPin);
-
-
     digitalWrite(trigPin, LOW);
     delayMicroseconds(10);
     digitalWrite(trigPin, HIGH);
@@ -46,22 +43,29 @@ void loop(){
 
     pinMode(echoPin, INPUT);
 
-    duration = pulseIn(echoPin, HIGH);
 
-    cm = (duration/2) / 29.1;
+    pResistorValor = analogRead(pResistor);
 
-//    (ldrValor < 250 && cm < 10) ? digitalWrite(ledBranco, HIGH) : digitalWrite(ledBranco, LOW)
+    if (pResistorValor < ENOUGH_LIGHT) {
+        digitalWrite(ledBranco, HIGH)
 
-    analogWrite(ledBranco, cm);
+    
+        duration = pulseIn(echoPin, HIGH);
+        cm = (duration/2) / 29.1;    
+    
+        analogWrite(ledBranco, cm);
+    
+        acenderLed(ledVermelho, 11, 15);
+        acenderLed(ledAmarelo, 16, 30);
+        acenderLed(ledVerde, 31, 50);
+    
+        Serial.print("\nValor LDR: ");
+        Serial.print(pResistorValor);
+        Serial.print("\nDistancia: ");
+        Serial.print(cm);
 
-    acenderLed(ledVermelho, 11, 15);
-    acenderLed(ledAmarelo, 16, 30);
-    acenderLed(ledVerde, 31, 50);
-
-    Serial.print("\nValor LDR: ");
-    Serial.print(ldrValor);
-    Serial.print("\nDistancia: ");
-    Serial.print(cm);
-
+    } else {
+        digitalWrite(ledBranco, LOW)
+    }
     delay(50);
 }
